@@ -43,6 +43,45 @@ bool cmpy(Point a, Point b)
 {
     return a.y == b.y ? a.x < b.x : a.y < b.y;
 }
+
+void removeDuplicate(Pairs &res){
+    int i,j,k;
+    for (i = 0; i < res.count; i++)
+    {
+        for (j = i+1; j < res.count; j++)
+        {
+            if ((res.p[j].a == res.p[i].a && res.p[j].b == res.p[i].b) || (res.p[j].a == res.p[i].b && res.p[j].b == res.p[i].a))
+            {
+                for(k=j;k<res.count-1;k++){
+                    res.p[k]=res.p[k+1];
+                }
+                res.count--;
+                break;
+            }
+        }
+    }
+}
+
+void mergePairs(Pairs &a,Pairs &b){
+    int i,j;
+    for (i = 0; i < b.count; i++)
+        {
+            int flag = 0, j;
+            for (j = 0; j < a.count; j++)
+            {
+                if ((a.p[j].a == b.p[i].a && a.p[j].b == b.p[i].b) || (a.p[j].a == b.p[i].b && a.p[j].b == b.p[i].a))
+                {
+                    flag = 1;
+                    a.count--;
+                    break;
+                }
+            }
+            if (flag != 1)
+                a.p[a.count + i] = b.p[i];
+        }
+        a.count += b.count;
+}
+
 Pairs getClosestPair(int begin, int end, Point p[])
 {
     int i, j;
@@ -109,22 +148,7 @@ Pairs getAreaPair(int begin, int end, Point p[])
     {
         dist = left.dist;
         res = left;
-        for (i = 0; i < right.count; i++)
-        {
-            int flag = 0, j;
-            for (j = 0; j < res.count; j++)
-            {
-                if ((res.p[j].a == right.p[i].a && res.p[j].b == right.p[i].b) || (res.p[j].a == right.p[i].b && res.p[j].b == right.p[i].a))
-                {
-                    flag = 1;
-                    res.count--;
-                    break;
-                }
-            }
-            if (flag != 1)
-                res.p[res.count + i] = right.p[i];
-        }
-        res.count += right.count;
+        mergePairs(res,right);
     }
 
     count = 0;
@@ -138,39 +162,9 @@ Pairs getAreaPair(int begin, int end, Point p[])
     if (mid.dist < dist)
         res = mid;
     else if (mid.dist == dist)
-    {
-        for (i = 0; i < mid.count; i++)
-        {
-            int flag = 0, j;
-            for (j = 0; j < res.count; j++)
-            {
-                if ((res.p[j].a == mid.p[i].a && res.p[j].b == mid.p[i].b) || (res.p[j].a == mid.p[i].b && res.p[j].b == mid.p[i].a))
-                {
-                    flag = 1;
-                    res.count--;
-                    break;
-                }
-            }
-            if (flag != 1)
-                res.p[res.count + i] = mid.p[i];
-        }
-        res.count += mid.count;
-    }
+        mergePairs(res,mid);
     int j,k;
-    for (i = 0; i < res.count; i++)
-    {
-        for (j = i+1; j < res.count; j++)
-        {
-            if ((res.p[j].a == res.p[i].a && res.p[j].b == res.p[i].b) || (res.p[j].a == res.p[i].b && res.p[j].b == res.p[i].a))
-            {
-                for(k=j;k<res.count-1;k++){
-                    res.p[k]=res.p[k+1];
-                }
-                res.count--;
-                break;
-            }
-        }
-    }
+    removeDuplicate(res);
     return res;
 }
 
